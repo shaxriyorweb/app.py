@@ -49,7 +49,7 @@ with st.form("user_form"):
     st.subheader("👤 Shaxsiy Ma'lumotlar")
     name = st.text_input("Ismingiz")
     surname = st.text_input("Familiyangiz")
-    age = st.number_input("Yoshingiz", min_value=6, max_value=22, step=1)
+    age = st.number_input("Yoshingiz", min_value=7, max_value=25, step=1)
     gender = st.radio("Jinsingiz", ["Erkak", "Ayol"])
     region = st.selectbox("Qaysi viloyatdan siz?", regions)
     submit_info = st.form_submit_button("Testni boshlash")
