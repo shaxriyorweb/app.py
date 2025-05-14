@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import sqlite3
+import random
 
 # Viloyatlar ro'yxati
 regions = [
@@ -20,12 +21,6 @@ test_questions = [
     ("Men yangi narsalarni:", ["A. Qiziqish bilan sinab ko‘raman", "B. Ehtiyot bilan yondashaman", "C. Yolg‘iz o‘rganishni yoqtiraman"]),
     ("Guruhda ishlash men uchun:", ["A. Juda maroqli", "B. O‘rtacha", "C. Qiyin"]),
     ("Tanbeh eshitsam:", ["A. Xulosa chiqaraman", "B. O‘zimga tanqid qilaman", "C. Juda xafa bo‘laman"]),
-    ("Men uchun dam olish degani:", ["A. Do‘stlar bilan vaqt o‘tkazish", "B. Kitob o‘qish yoki rasm chizish", "C. YolG‘iz qolib orom olish"]),
-    ("Men darsda:", ["A. Faol qatnashaman", "B. O‘rtacha qatnashaman", "C. Ko‘proq kuzatuvchiman"]),
-    ("Men stress holatida:", ["A. Kim bilandir suhbatlashaman", "B. Ichimda saqlayman", "C. Yolg‘iz qolishni xohlayman"]),
-    ("Ota-onam bilan munosabatim:", ["A. Ochiq va do‘stona", "B. Hurmatli va masofali", "C. Juda ko‘p gaplashmaymiz"]),
-    ("Men tushkunlikka tushsam:", ["A. Do‘stlarim bilan vaqt o‘tkazaman", "B. Musiqa eshitaman", "C. Yolg‘iz qolaman"]),
-    ("Sinfda biror narsa noto‘g‘ri bo‘lsa:", ["A. Aytilishini xohlayman", "B. Ichimda saqlayman", "C. Aralashmayman"]),
     ("Men orzularim haqida:", ["A. Ochiqchasiga gaplashaman", "B. Faqat yaqinlarimga aytaman", "C. Hech kimga aytmayman"]),
     ("Men o‘zimni qanday ko‘raman?", ["A. Faol va ijtimoiy", "B. O‘rtacha", "C. Tinch va mustaqil"]),
     ("Yolg‘izlik siz uchun:", ["A. Zerikarli", "B. Foydali", "C. Zarur"]),
@@ -49,7 +44,7 @@ with st.form("user_form"):
     st.subheader("👤 Shaxsiy Ma'lumotlar")
     name = st.text_input("Ismingiz")
     surname = st.text_input("Familiyangiz")
-    age = st.number_input("Yoshingiz", min_value=7, max_value=25, step=1)
+    age = st.number_input("Yoshingiz", min_value=6, max_value=22, step=1)
     gender = st.radio("Jinsingiz", ["Erkak", "Ayol"])
     region = st.selectbox("Qaysi viloyatdan siz?", regions)
     submit_info = st.form_submit_button("Testni boshlash")
@@ -71,6 +66,7 @@ with st.form("user_form"):
 # Test savollari boshlangan bo‘lsa
 if st.session_state.get("started"):
     st.header("📋 30 ta Savol")
+    random.shuffle(test_questions)  # Savollarni tasodifiy tartibda joylashtirish
     answers = []
     with st.form("quiz_form"):
         for i, (question, options) in enumerate(test_questions):
@@ -138,5 +134,23 @@ if st.sidebar.button("📊 Barcha natijalarni ko‘rish"):
     conn = sqlite3.connect("results.db")
     df = pd.read_sql_query("SELECT * FROM results", conn)
     conn.close()
-    st.subheader("📋 Foydalanuvchilar natijalari")
-    st.dataframe(df)
+    
+    # Viloyat bo‘yicha natijalar
+    st.subheader("📊 Viloyat bo‘yicha natijalar")
+    region_data = df.groupby('region').agg(
+        a_avg=('a_percent', 'mean'),
+        b_avg=('b_percent', 'mean'),
+        c_avg=('c_percent', 'mean')
+    ).reset_index()
+
+    st.write(region_data)
+
+    # Yosh bo‘yicha natijalar
+    st.subheader("📊 Yosh bo‘yicha natijalar")
+    age_data = df.groupby('age').agg(
+        a_avg=('a_percent', 'mean'),
+        b_avg=('b_percent', 'mean'),
+        c_avg=('c_percent', 'mean')
+    ).reset_index()
+
+    st.write(age_data)
