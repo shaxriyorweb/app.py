@@ -6,7 +6,7 @@ from db import init_db, insert_result, get_all_results
 # Dastlabki sozlamalar
 st.set_page_config(page_title="Psixologik Test", layout="centered")
 
-# Fon rasmi
+# Fon rasm
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
