@@ -1,116 +1,58 @@
 import streamlit as st
 import pandas as pd
+import sqlite3
 
-# Viloyatlar ro‘yxati
+# Viloyatlar ro'yxati
 regions = [
     "Toshkent", "Samarqand", "Buxoro", "Farg‘ona", "Andijon", "Namangan",
     "Xorazm", "Surxondaryo", "Qashqadaryo", "Jizzax", "Sirdaryo", "Navoiy"
 ]
 
-# 30 ta savol va variantlar
-questions_with_options = [
-    ("Sinfda yangi odam bilan tanishishga tayyorman:", 
-     ["A: Ha, bu menga yoqadi", "B: Ba'zida, kayfiyatga qarab", "C: Yo‘q, men odatda tortinchoqman"]),
-
-    ("Men xatolik qilsam nima qilaman?", 
-     ["A: Kulgili hol deb qarayman", "B: Tuzatishga harakat qilaman", "C: Ko‘p o‘ylab qolaman"]),
-
-    ("Do‘stlarim meni qanday tasvirlaydi?", 
-     ["A: Ochiq va ijobiy", "B: Yaxshi tinglovchi", "C: Jiddiy va mustaqil"]),
-
-    ("Men uchun maktabdagi eng yaxshi narsa:", 
-     ["A: Do‘stlarim bilan vaqt o‘tkazish", "B: Yangi narsalarni o‘rganish", "C: Tanaffus va tinchlik"]),
-
-    ("Agar sinfdoshim yig‘lasa...", 
-     ["A: Yoniga borib tasalli beraman", "B: Nima bo‘lganini so‘rayman", "C: Uning yolg‘iz qolishini xohlayman"]),
-
-    ("Darsdan keyin nima qilganni yoqtirasiz?", 
-     ["A: Do‘stlarim bilan ko‘rishish", "B: Uyga vazifa qilish", "C: Yolg‘iz dam olish"]),
-
-    ("Ko‘p hollarda men o‘zimni qanday his qilaman?", 
-     ["A: Quvnoq", "B: Tinch", "C: Xayolparast"]),
-
-    ("Men yangi narsalarni:", 
-     ["A: Qiziqib o‘rganaman", "B: O‘rganishga tayyorman", "C: Avval xavfsizligini tekshiraman"]),
-
-    ("Guruhda ishlash men uchun:", 
-     ["A: Juda yoqimli", "B: Qiziqarli, lekin qiyin", "C: Yolg‘iz ishlashni afzal ko‘raman"]),
-
-    ("Tanbeh eshitsam:", 
-     ["A: O‘rganaman", "B: Nima xato bo‘lganini tahlil qilaman", "C: Hafsalam pir bo‘ladi"]),
-
-    ("Men uchun dam olish degani:", 
-     ["A: Do‘stlar bilan o‘yin", "B: Kitob o‘qish", "C: Tinch xonada yolg‘iz bo‘lish"]),
-
-    ("Men darsda:", 
-     ["A: Faol qatnashaman", "B: Eshitib, yozib boraman", "C: Kuzataman, kam gapiraman"]),
-
-    ("Men stress holatida:", 
-     ["A: Do‘stlarga murojaat qilaman", "B: Chuqur nafas olaman", "C: Yolg‘iz qolishni afzal ko‘raman"]),
-
-    ("Ota-onam bilan munosabatim:", 
-     ["A: Juda yaqinmiz", "B: Norm", "C: Masofa bor"]),
-
-    ("Men tushkunlikka tushsam:", 
-     ["A: Kim bilandir gaplashaman", "B: Musiqa eshitaman", "C: Ichimda saqlayman"]),
-
-    ("Sinfda biror narsa noto‘g‘ri bo‘lsa:", 
-     ["A: Darhol aytaman", "B: O‘qituvchiga aytaman", "C: Tinch turaman"]),
-
-    ("Men orzularim haqida:", 
-     ["A: Ochiq gaplashaman", "B: Yaqin do‘stlarim biladi", "C: Ichimda saqlayman"]),
-
-    ("Men o‘zimni qanday ko‘raman?", 
-     ["A: Ijtimoiy va do‘stona", "B: O‘rtacha", "C: Mustaqil va o‘z fikrida sobit"]),
-
-    ("Yolg‘izlik siz uchun:", 
-     ["A: Zerikarli", "B: Ba'zida kerak", "C: Menga yoqadi"]),
-
-    ("Musobaqalarda qatnashish:", 
-     ["A: Juda xohlayman", "B: Ba'zida", "C: Yo‘q, xohlamayman"]),
-
-    ("Jamoaviy ishda:", 
-     ["A: Yetakchi bo‘lishni yoqtiraman", "B: Hamkorlikni qadrlayman", "C: Yolg‘iz ishlashni xohlayman"]),
-
-    ("Men fikr bildirayotganda:", 
-     ["A: Ochiq gapiraman", "B: Mulohaza bilan aytaman", "C: Kam gapiraman"]),
-
-    ("Ertalab uyg‘onish:", 
-     ["A: Energiya bilan", "B: Sekin", "C: Qiyin"]),
-
-    ("Yangi joylar:", 
-     ["A: Menga yoqadi", "B: Yangi tajriba deb bilaman", "C: Men eski joylarga o‘rganganman"]),
-
-    ("Men his-tuyg‘ularimni:", 
-     ["A: Bemalol ifodalayman", "B: Yaqinlarim biladi", "C: Ichimda saqlayman"]),
-
-    ("Agar kimgadir yordam kerak bo‘lsa:", 
-     ["A: Darhol yordam beraman", "B: Qanday yordam kerakligini so‘rayman", "C: Agar chaqirsa, boraman"]),
-
-    ("Yutuqqa erishsam:", 
-     ["A: Boshqalar bilan bo‘lishaman", "B: Ichimda quvonaman", "C: Oddiy hol deb bilaman"]),
-
-    ("Baholar siz uchun:", 
-     ["A: Muhim", "B: O‘rganish vositasi", "C: Ko‘p ahamiyatsiz"]),
-
-    ("Tushunmovchilik yuz bersa:", 
-     ["A: Gaplashib hal qilaman", "B: Vaqt o‘tishi bilan hal bo‘ladi", "C: Uzoq yuraman"]),
-
-    ("O‘zimni eng baxtli his qilaman:", 
-     ["A: Do‘stlar bilan", "B: Ota-onam bilan", "C: Yolg‘iz paytlarimda"]),
+# 30 ta savol va har biriga mos A/B/C variantlari
+test_questions = [
+    ("Sinfda yangi odam bilan tanishishga tayyorman:", ["A. Ha, xursand bo‘laman", "B. Biroz uyalaman", "C. Yolg‘iz qolishni afzal ko‘raman"]),
+    ("Men xatolik qilsam nima qilaman?", ["A. O‘rganaman va davom etaman", "B. Biroz xafa bo‘laman", "C. O‘zimni juda aybdor his qilaman"]),
+    ("Do‘stlarim meni qanday tasvirlaydi?", ["A. Do‘stona va ochiq", "B. Jiddiy va ishonchli", "C. Tinch va yolg‘onchi emas"]),
+    ("Men uchun maktabdagi eng yaxshi narsa:", ["A. Do‘stlar bilan suhbat", "B. Yangi bilim olish", "C. Mustaqil ish qilish imkoni"]),
+    ("Agar sinfdoshim yig‘lasa...", ["A. Darhol yordam beraman", "B. Kuzataman, keyin yordam beraman", "C. Aralashmayman"]),
+    ("Darsdan keyin nima qilganni yoqtirasiz?", ["A. Do‘stlar bilan ko‘chada yurish", "B. Uyga borib kitob o‘qish", "C. Kompyuter o‘yinlari bilan vaqt o‘tkazish"]),
+    ("Ko‘p hollarda men o‘zimni qanday his qilaman?", ["A. Xursand va faol", "B. Tinch va o‘ylovchan", "C. Hafsalasi pir bo‘lgan"]),
+    ("Men yangi narsalarni:", ["A. Qiziqish bilan sinab ko‘raman", "B. Ehtiyot bilan yondashaman", "C. Yolg‘iz o‘rganishni yoqtiraman"]),
+    ("Guruhda ishlash men uchun:", ["A. Juda maroqli", "B. O‘rtacha", "C. Qiyin"]),
+    ("Tanbeh eshitsam:", ["A. Xulosa chiqaraman", "B. O‘zimga tanqid qilaman", "C. Juda xafa bo‘laman"]),
+    ("Men uchun dam olish degani:", ["A. Do‘stlar bilan vaqt o‘tkazish", "B. Kitob o‘qish yoki rasm chizish", "C. YolG‘iz qolib orom olish"]),
+    ("Men darsda:", ["A. Faol qatnashaman", "B. O‘rtacha qatnashaman", "C. Ko‘proq kuzatuvchiman"]),
+    ("Men stress holatida:", ["A. Kim bilandir suhbatlashaman", "B. Ichimda saqlayman", "C. Yolg‘iz qolishni xohlayman"]),
+    ("Ota-onam bilan munosabatim:", ["A. Ochiq va do‘stona", "B. Hurmatli va masofali", "C. Juda ko‘p gaplashmaymiz"]),
+    ("Men tushkunlikka tushsam:", ["A. Do‘stlarim bilan vaqt o‘tkazaman", "B. Musiqa eshitaman", "C. Yolg‘iz qolaman"]),
+    ("Sinfda biror narsa noto‘g‘ri bo‘lsa:", ["A. Aytilishini xohlayman", "B. Ichimda saqlayman", "C. Aralashmayman"]),
+    ("Men orzularim haqida:", ["A. Ochiqchasiga gaplashaman", "B. Faqat yaqinlarimga aytaman", "C. Hech kimga aytmayman"]),
+    ("Men o‘zimni qanday ko‘raman?", ["A. Faol va ijtimoiy", "B. O‘rtacha", "C. Tinch va mustaqil"]),
+    ("Yolg‘izlik siz uchun:", ["A. Zerikarli", "B. Foydali", "C. Zarur"]),
+    ("Musobaqalarda qatnashish:", ["A. Juda xush ko‘raman", "B. Ba'zida qatnashaman", "C. Yo‘q, yoqtirmayman"]),
+    ("Jamoaviy ishda:", ["A. Boshchilik qilishni yoqtiraman", "B. O‘rtada bo‘laman", "C. Chetda qolishni afzal ko‘raman"]),
+    ("Men fikr bildirayotganda:", ["A. Bemalol fikr bildiraman", "B. Oldin boshqalarga quloq solaman", "C. Kamdan-kam fikr bildiraman"]),
+    ("Ertalab uyg‘onish:", ["A. Yengil", "B. Biroz qiynalaman", "C. Juda qiyin"]),
+    ("Yangi joylar:", ["A. Qiziqarli", "B. G‘alati lekin chiroyli", "C. Notanish va noqulay"]),
+    ("Men his-tuyg‘ularimni:", ["A. Oson bildiraman", "B. Faqat yaqinlarim bilan bo‘lishaman", "C. Ko‘rsatmayman"]),
+    ("Agar kimgadir yordam kerak bo‘lsa:", ["A. Birinchi bo‘lib yordam beraman", "B. Kutib turaman, so‘rasa yordam beraman", "C. Aralashmayman"]),
+    ("Yutuqqa erishsam:", ["A. Boshqalar bilan bo‘lishaman", "B. Ichimda xursand bo‘laman", "C. Oddiy narsa deb o‘ylayman"]),
+    ("Baholar siz uchun:", ["A. Muhim", "B. Foydali lekin muhim emas", "C. Zarur emas"]),
+    ("Tushunmovchilik yuz bersa:", ["A. Gaplashib hal qilaman", "B. Kutaman, o‘zi o‘tadi", "C. Uzoqlashaman"]),
+    ("O‘zimni eng baxtli his qilaman:", ["A. Do‘stlar orasida", "B. O‘zim yoqtirgan ish bilan band bo‘lsam", "C. O‘zim bilan yolg‘iz qolganda"]),
 ]
 
-# --------------- Streamlit UI ---------------
-st.title("📘 Psixologik Test (Maktab O‘quvchilari Uchun)")
+st.title("🧠 Psixologik Test (Maktab o‘quvchilari uchun)")
 
+# Foydalanuvchi ma'lumotlari formasi
 with st.form("user_form"):
     st.subheader("👤 Shaxsiy Ma'lumotlar")
-    name = st.text_input("Ism")
-    surname = st.text_input("Familiya")
-    age = st.number_input("Yosh", min_value=6, max_value=22)
-    gender = st.radio("Jins", ["Erkak", "Ayol"])
-    region = st.selectbox("Viloyatni tanlang", regions)
-    submit_info = st.form_submit_button("✅ Testni boshlash")
+    name = st.text_input("Ismingiz")
+    surname = st.text_input("Familiyangiz")
+    age = st.number_input("Yoshingiz", min_value=6, max_value=22, step=1)
+    gender = st.radio("Jinsingiz", ["Erkak", "Ayol"])
+    region = st.selectbox("Qaysi viloyatdan siz?", regions)
+    submit_info = st.form_submit_button("Testni boshlash")
 
 if submit_info:
     st.session_state["user"] = {
@@ -122,17 +64,15 @@ if submit_info:
     }
     st.session_state["started"] = True
 
-# Test savollari
+# Test savollari boshlangan bo‘lsa
 if st.session_state.get("started"):
-    st.header("📝 Test Savollari")
-
+    st.header("📋 30 ta Savol")
     answers = []
     with st.form("quiz_form"):
-        for i, (question, options) in enumerate(questions_with_options):
+        for i, (question, options) in enumerate(test_questions):
             answer = st.radio(f"{i+1}. {question}", options, key=f"q{i}")
-            answers.append(answer[0])  # faqat A/B/C belgisi olinadi
-
-        submit_answers = st.form_submit_button("📊 Natijani ko‘rish")
+            answers.append(answer[0])  # A, B, C ni oladi
+        submit_answers = st.form_submit_button("✅ Natijani ko‘rish")
 
     if submit_answers:
         a_count = answers.count("A")
@@ -140,39 +80,59 @@ if st.session_state.get("started"):
         c_count = answers.count("C")
         total = len(answers)
 
-        st.subheader("📊 Natijalar:")
-        st.write(f"A javoblari: {a_count} ta ({a_count/total*100:.1f}%)")
-        st.write(f"B javoblari: {b_count} ta ({b_count/total*100:.1f}%)")
-        st.write(f"C javoblari: {c_count} ta ({c_count/total*100:.1f}%)")
+        a_percent = round(a_count / total * 100, 1)
+        b_percent = round(b_count / total * 100, 1)
+        c_percent = round(c_count / total * 100, 1)
 
-        st.subheader("🧠 Maslahat:")
+        st.subheader("📊 Sizning Natijangiz")
+        st.write(f"A javoblari: {a_count} ta ({a_percent}%)")
+        st.write(f"B javoblari: {b_count} ta ({b_percent}%)")
+        st.write(f"C javoblari: {c_count} ta ({c_percent}%)")
+
+        st.subheader("🧠 Maslahat")
         if a_count > b_count and a_count > c_count:
             st.info("Siz do‘stona, ochiq va ijtimoiy odamsiz. Ijtimoiy faolligingizni qo‘llab-quvvatlang.")
         elif b_count > a_count and b_count > c_count:
             st.info("Siz diqqatli va mulohazali odamsiz. O‘zingizga ishonchingizni oshiring.")
         elif c_count > a_count and c_count > b_count:
-            st.info("Siz mustaqil va o‘z dunyosiga ega odamsiz. Boshqalar bilan hamkorlik qilishga harakat qiling.")
+            st.info("Siz mustaqil va ichki dunyoga ega odamsiz. Boshqalar bilan hamkorlikni ko‘paytiring.")
         else:
-            st.info("Sizda har xil jihatlar uyg‘unlashgan. Bu yaxshi holat.")
+            st.info("Sizda turli fazilatlar uyg‘unlashgan. Bu ijobiy jihat.")
 
-        # CSV faylga natijani yozish
-        user_data = st.session_state["user"]
-        result_df = pd.DataFrame([{
-            "Ism": user_data["name"],
-            "Familiya": user_data["surname"],
-            "Yosh": user_data["age"],
-            "Jins": user_data["gender"],
-            "Viloyat": user_data["region"],
-            "A foizi": round(a_count/total*100, 1),
-            "B foizi": round(b_count/total*100, 1),
-            "C foizi": round(c_count/total*100, 1)
-        }])
+        # Natijalarni SQLite bazaga saqlash
+        conn = sqlite3.connect("results.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            surname TEXT,
+            age INTEGER,
+            gender TEXT,
+            region TEXT,
+            a_percent REAL,
+            b_percent REAL,
+            c_percent REAL
+        )""")
+        conn.commit()
 
-        try:
-            existing = pd.read_csv("results.csv")
-            final = pd.concat([existing, result_df], ignore_index=True)
-        except FileNotFoundError:
-            final = result_df
-
-        final.to_csv("results.csv", index=False)
+        user = st.session_state["user"]
+        cursor.execute("""
+        INSERT INTO results (name, surname, age, gender, region, a_percent, b_percent, c_percent)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user["name"], user["surname"], user["age"], user["gender"], user["region"],
+            a_percent, b_percent, c_percent
+        ))
+        conn.commit()
+        conn.close()
         st.success("✅ Natijangiz saqlandi!")
+
+# Admin panel - barcha natijalarni ko‘rish
+st.sidebar.markdown("🔐 **Admin panel**")
+if st.sidebar.button("📊 Barcha natijalarni ko‘rish"):
+    conn = sqlite3.connect("results.db")
+    df = pd.read_sql_query("SELECT * FROM results", conn)
+    conn.close()
+    st.subheader("📋 Foydalanuvchilar natijalari")
+    st.dataframe(df)
