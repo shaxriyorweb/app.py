@@ -44,7 +44,7 @@ test_questions = [
 
 st.title("🧠 Psixologik Test (Maktab o‘quvchilari uchun)")
 
-# Foydalanuvchi ma'lumotlari formasi
+# Foydalanuvchi ma'lumotlari formasi (Majburiy maydonlar bilan)
 with st.form("user_form"):
     st.subheader("👤 Shaxsiy Ma'lumotlar")
     name = st.text_input("Ismingiz")
@@ -54,15 +54,19 @@ with st.form("user_form"):
     region = st.selectbox("Qaysi viloyatdan siz?", regions)
     submit_info = st.form_submit_button("Testni boshlash")
 
-if submit_info:
-    st.session_state["user"] = {
-        "name": name,
-        "surname": surname,
-        "age": age,
-        "gender": gender,
-        "region": region
-    }
-    st.session_state["started"] = True
+    if submit_info:
+        # Majburiy maydonlarni tekshirish
+        if not name or not surname or not region or not gender:
+            st.warning("Iltimos, barcha ma'lumotlarni to‘liq kiriting.")
+        else:
+            st.session_state["user"] = {
+                "name": name,
+                "surname": surname,
+                "age": age,
+                "gender": gender,
+                "region": region
+            }
+            st.session_state["started"] = True
 
 # Test savollari boshlangan bo‘lsa
 if st.session_state.get("started"):
