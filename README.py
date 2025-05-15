@@ -10,7 +10,6 @@ regions = [
     "Toshkent", "Samarqand", "Buxoro", "Farg‘ona", "Andijon", "Namangan",
     "Xorazm", "Surxondaryo", "Qashqadaryo", "Jizzax", "Sirdaryo", "Navoiy"
 ]
-
 # 30 ta savol va variantlar
 test_questions = [
     ("Sinfda yangi odam bilan tanishishga tayyorman:", ["A. Ha, xursand bo‘laman", "B. Biroz uyalaman", "C. Yolg‘iz qolishni afzal ko‘raman"]),
