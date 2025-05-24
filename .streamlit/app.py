@@ -7,7 +7,7 @@ import requests
 
 # Telegram sozlamalari
 BOT_TOKEN = '7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY'     # <-- bu yerga bot tokeningizni yozing
-CHAT_ID = 'YOUR_CHAT_ID'                  # <-- bu yerga adminning chat_id sini yozing
+CHAT_ID = '7750409176'                  # <-- bu yerga adminning chat_id sini yozing
 
 # Rasmlar saqlanadigan joy
 if not os.path.exists("images"):
