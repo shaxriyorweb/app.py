@@ -1,24 +1,29 @@
 import sqlite3
 
-conn = sqlite3.connect('users.db')
-c = conn.cursor()
+def init_db():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
 
-# Foydalanuvchilar jadvali
-c.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT,
-    firstname TEXT,
-    lastname TEXT
-)
-''')
+    # Jadval yaratish
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL
+    )
+    ''')
 
-# Misol foydalanuvchi
-c.execute("INSERT INTO users (username, password, firstname, lastname) VALUES (?, ?, ?, ?)",
-          ('testuser', '1234', 'Ali', 'Valiyev'))
+    # Test foydalanuvchi qo'shish (parol oddiy matn: 12345)
+    c.execute('''
+    INSERT OR IGNORE INTO users (username, password, first_name, last_name)
+    VALUES (?, ?, ?, ?)
+    ''', ('user1', '12345', 'Ali', 'Valiyev'))
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
+    print("Bazani yaratish va test foydalanuvchi qo'shish yakunlandi.")
 
-print("✅ Foydalanuvchilar bazasi yaratildi.")
+if __name__ == "__main__":
+    init_db()
