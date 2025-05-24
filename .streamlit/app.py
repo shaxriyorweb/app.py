@@ -6,7 +6,7 @@ import cv2
 import requests
 
 # Telegram sozlamalari
-BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'     # <-- bu yerga bot tokeningizni yozing
+BOT_TOKEN = '7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY'     # <-- bu yerga bot tokeningizni yozing
 CHAT_ID = 'YOUR_CHAT_ID'                  # <-- bu yerga adminning chat_id sini yozing
 
 # Rasmlar saqlanadigan joy
