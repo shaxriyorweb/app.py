@@ -5,9 +5,13 @@ import time
 import cv2
 import requests
 
+# 🟡 Baza yaratish funksiyasini chaqiramiz
+from init_db import init_db
+init_db()
+
 # Telegram sozlamalari
-BOT_TOKEN = '7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY'     # <-- bu yerga bot tokeningizni yozing
-CHAT_ID = '7750409176'                  # <-- bu yerga adminning chat_id sini yozing
+BOT_TOKEN = '7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY'
+CHAT_ID = ''
 
 # Rasmlar saqlanadigan joy
 if not os.path.exists("images"):
