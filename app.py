@@ -5,8 +5,8 @@ import sqlite3
 import os
 
 # ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "YOUR_BOT_TOKEN"   # Bu yerga Telegram bot tokeningizni yozing
-CHAT_ID = "YOUR_CHAT_ID"       # Bu yerga chat yoki guruh ID sini yozing
+BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"   # Bu yerga Telegram bot tokeningizni yozing
+CHAT_ID = "-1002671611327"       # Bu yerga chat yoki guruh ID sini yozing
 
 def send_telegram_message(text: str) -> bool:
     """Telegramga matnli xabar yuboradi"""
