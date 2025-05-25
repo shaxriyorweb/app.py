@@ -1,63 +1,37 @@
 import streamlit as st
+import sqlite3
+import datetime
 import requests
-from datetime import datetime
 
-# ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"   # <-- bu yerga o'zingizning bot tokeningizni yozing
-CHAT_ID = "-1002671611327"    # <-- bu yerga chat yoki guruh ID ni yozing
+# Telegram bot sozlamalari
+BOT_TOKEN = "YOUR_BOT_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
 
-def send_telegram_message(firstname: str, lastname: str, category: str) -> bool:
-    """Telegramga xodim kirishi haqida matnli xabar yuboradi"""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    text = (
-        f"📥 *Xodim tizimga kirdi!*\n\n"
-        f"👤 Ism: {firstname} {lastname}\n"
-        f"⏰ Vaqti: {now}"
-    )
+def send_to_telegram(firstname, lastname):
+    time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = f"📌 Yangi kirish:\n👤 {firstname} {lastname}\n🕒 {time_now}"
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "Markdown"
-    }
     try:
-        resp = requests.post(url, data=payload, timeout=5)
-        return resp.ok
-    except Exception:
-        return False
+        requests.post(url, data={"chat_id": CHAT_ID, "text": message})
+    except Exception as e:
+        st.error("❌ Telegramga yuborishda muammo yuz berdi.")
+        print(e)
 
-# ================= Foydalanuvchilar ma'lumotlari ==================
+# Oddiy foydalanuvchilar ro'yxati (bazasiz)
 users = {
-    "testuser": {"password": "1234", "firstname": "Ali", "lastname": "Valiyev"},
-    "johndoe":  {"password": "abcd", "firstname": "John", "lastname": "Doe"},
-    "janedoe":  {"password": "pass", "firstname": "Jane", "lastname": "Doe"},
-    "anvarbek": {"password": "qwerty", "firstname": "Anvar", "lastname": "Beknazarov"},
-    "nilufar":  {"password": "12345","firstname": "Nilufar","lastname": "Karimova"},
-    "asadbek":  {"password": "asdf", "firstname": "Asadbek","lastname": "Rasulov"},
-    "dilnoza":  {"password": "xyz",  "firstname": "Dilnoza","lastname": "Islomova"},
-    "temurbek":{"password":"temur123","firstname":"Temurbek","lastname":"Xolmatov"},
-    "aziza":    {"password":"aziza12","firstname":"Aziza","lastname":"G‘aniyeva"},
-    "olim":     {"password":"olim999","firstname":"Olim","lastname":"Murodov"}
+    "testuser": ("1234", "Ali", "Valiyev"),
+    "johndoe": ("abcd", "John", "Doe"),
+    "janedoe": ("pass", "Jane", "Doe")
 }
 
-def check_user(username: str, password: str):
-    """Login/parol to'g'ri bo'lsa (firstname, lastname, category) qaytaradi, aks holda None."""
-    user = users.get(username)
-    if user and user["password"] == password:
-        return user["firstname"], user["lastname"], user["category"]
+def check_user(username, password):
+    if username in users and users[username][0] == password:
+        return users[username][1], users[username][2]
     return None
 
-# ================= Streamlit UI ==============================
+# Streamlit UI
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
-st.markdown("""
-    <style>
-        body { background-color: #f8f9fa; }
-        .stButton>button { background-color: #2b8a3e; color: white; }
-        .stTextInput>div>div>input { border-radius: 5px; padding: 8px; }
-    </style>
-""", unsafe_allow_html=True)
-
-st.title("🔐 Xodim Kirish Tizimi")
+st.title("🔐 Xodim Kirish")
 
 login = st.text_input("Login")
 password = st.text_input("Parol", type="password")
@@ -65,11 +39,8 @@ password = st.text_input("Parol", type="password")
 if st.button("Kirish"):
     result = check_user(login, password)
     if result:
-        firstname, lastname, category = result
-        st.success(f"Xush kelibsiz, {firstname} {lastname}! ({category})")
-        if send_telegram_message(firstname, lastname, category):
-            st.info("✅ Telegramga yuborildi.")
-        else:
-            st.error("❌ Telegramga yuborishda muammo yuz berdi.")
+        firstname, lastname = result
+        st.success(f"Xush kelibsiz, {firstname} {lastname}!")
+        send_to_telegram(firstname, lastname)
     else:
-        st.error("❌ Login yoki parol noto‘g‘ri.")
+        st.error("Login yoki parol noto‘g‘ri.")
