@@ -3,9 +3,9 @@ import sqlite3
 from datetime import datetime
 import requests
 
-# ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"  # O'zingizning bot tokeningiz
-CHAT_ID = "-1002671611327"  # O'zingizning chat yoki guruh ID
+BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"
+CHAT_ID = "-1002671611327"
+DB_NAME = "users.db"
 
 def send_telegram_message(text: str):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -21,18 +21,16 @@ def send_telegram_message(text: str):
         st.error(f"Telegramga yuborishda xatolik: {e}")
         return False
 
-DB_PATH = "users.db"
-
 def check_user(username, password):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute("SELECT firstname, lastname, category FROM users WHERE username=? AND password=?", (username, password))
     result = c.fetchone()
     conn.close()
     return result
 
-# ================= Streamlit UI =============================
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
+
 st.markdown("""
     <style>
         body {
@@ -72,8 +70,8 @@ if st.button("Kirish"):
         else:
             st.error("❌ Telegramga yuborilmadi.")
         
-        if category.lower() == "admin":
+        if login == "admin":
             st.subheader("🛠️ Admin Panel")
-            st.write("Hozircha: Foydalanuvchilarni ko‘rish yoki tahrirlash funksiyasi mavjud emas. Qo‘shamizmi?")
+            st.write("Hozircha: Foydalanuvchilarni ko‘rish yoki tahrirlash funksiyasi mavjud emas.")
     else:
         st.error("❌ Login yoki parol noto‘g‘ri.")
