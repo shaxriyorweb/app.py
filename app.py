@@ -12,7 +12,6 @@ def send_telegram_message(firstname: str, lastname: str, category: str) -> bool:
     text = (
         f"📥 *Xodim tizimga kirdi!*\n\n"
         f"👤 Ism: {firstname} {lastname}\n"
-        f"🏷 Kategoriya: {category}\n"
         f"⏰ Vaqti: {now}"
     )
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -29,16 +28,16 @@ def send_telegram_message(firstname: str, lastname: str, category: str) -> bool:
 
 # ================= Foydalanuvchilar ma'lumotlari ==================
 users = {
-    "testuser": {"password": "1234", "firstname": "Ali", "lastname": "Valiyev", "category": "Admin"},
-    "johndoe":  {"password": "abcd", "firstname": "John", "lastname": "Doe",     "category": "Staff"},
-    "janedoe":  {"password": "pass", "firstname": "Jane", "lastname": "Doe",     "category": "HR"},
-    "anvarbek": {"password": "qwerty", "firstname": "Anvar", "lastname": "Beknazarov", "category": "IT"},
-    "nilufar":  {"password": "12345","firstname": "Nilufar","lastname": "Karimova",   "category": "Finance"},
-    "asadbek":  {"password": "asdf", "firstname": "Asadbek","lastname": "Rasulov",    "category": "Manager"},
-    "dilnoza":  {"password": "xyz",  "firstname": "Dilnoza","lastname": "Islomova",   "category": "HR"},
-    "temurbek":{"password":"temur123","firstname":"Temurbek","lastname":"Xolmatov",  "category":"Support"},
-    "aziza":    {"password":"aziza12","firstname":"Aziza","lastname":"G‘aniyeva",     "category":"Developer"},
-    "olim":     {"password":"olim999","firstname":"Olim","lastname":"Murodov",        "category":"Logistics"}
+    "testuser": {"password": "1234", "firstname": "Ali", "lastname": "Valiyev"},
+    "johndoe":  {"password": "abcd", "firstname": "John", "lastname": "Doe"},
+    "janedoe":  {"password": "pass", "firstname": "Jane", "lastname": "Doe"},
+    "anvarbek": {"password": "qwerty", "firstname": "Anvar", "lastname": "Beknazarov"},
+    "nilufar":  {"password": "12345","firstname": "Nilufar","lastname": "Karimova"},
+    "asadbek":  {"password": "asdf", "firstname": "Asadbek","lastname": "Rasulov"},
+    "dilnoza":  {"password": "xyz",  "firstname": "Dilnoza","lastname": "Islomova"},
+    "temurbek":{"password":"temur123","firstname":"Temurbek","lastname":"Xolmatov"},
+    "aziza":    {"password":"aziza12","firstname":"Aziza","lastname":"G‘aniyeva"},
+    "olim":     {"password":"olim999","firstname":"Olim","lastname":"Murodov"}
 }
 
 def check_user(username: str, password: str):
