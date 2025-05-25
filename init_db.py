@@ -1,15 +1,18 @@
 import sqlite3
 import os
 
+# Fayl nomini aniqlaymiz
+DB_PATH = "users.db"
+
 def init_db():
-    # Agar bazaviy fayl mavjud bo'lsa, o'chirib tashlaymiz (yangi bazani yaratish uchun)
+    # Agar bazaviy fayl mavjud bo‘lsa, o‘chiramiz (yangi baza yaratish uchun)
     if os.path.exists(DB_PATH):
         os.remove(DB_PATH)
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    # Jadval yaratish (category ustuni bilan)
+    # Jadval yaratish
     c.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,7 +24,7 @@ def init_db():
     )
     ''')
 
-    # 10 ta xodim qo‘shish
+    # Foydalanuvchilar ro'yxati
     users = [
         ("testuser", "1234", "Ali", "Valiyev", "Admin"),
         ("johndoe", "abcd", "John", "Doe", "Staff"),
@@ -35,6 +38,7 @@ def init_db():
         ("olim", "olim999", "Olim", "Murodov", "Logistics")
     ]
 
+    # Ma'lumotlarni qo'shamiz
     for user in users:
         c.execute(
             "INSERT INTO users (username, password, firstname, lastname, category) VALUES (?, ?, ?, ?, ?)",
@@ -45,5 +49,6 @@ def init_db():
     conn.close()
     print("✅ Foydalanuvchilar bazasi muvaffaqiyatli yaratildi!")
 
+# Fayl bevosita ishga tushirilsa
 if __name__ == "__main__":
     init_db()
