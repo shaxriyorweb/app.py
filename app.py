@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from datetime import datetime
 import sqlite3
-import os
+import pytz  # Qo‘shildi
 
 # ================= Telegram bot sozlamalari ==================
 BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"   # Bu yerga Telegram bot tokeningizni yozing
@@ -55,7 +55,7 @@ def check_user(username, password):
     conn.close()
     return result  # (firstname, lastname) yoki None
 
-# ================= Streamlit UI ==============================
+# ================= Streamlit UI ===============================
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
 st.title("🔐 Xodim Kirish Tizimi")
 
@@ -69,7 +69,10 @@ if st.button("Kirish"):
     user = check_user(login, password)
     if user:
         firstname, lastname = user
-        vaqt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Toshkent vaqt zonasi bo‘yicha hozirgi vaqtni olish
+        tz = pytz.timezone('Asia/Tashkent')
+        vaqt = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
 
         st.success(f"Xush kelibsiz, {firstname} {lastname}!")
 
