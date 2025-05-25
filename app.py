@@ -8,6 +8,7 @@ BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"
 CHAT_ID = "-1002671611327"
 
 def send_to_telegram(firstname, lastname):
+     tz = pytz.timezone("Asia/Tashkent")
     time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     message = f"📌 Yangi kirish:\n👤 {firstname} {lastname}\n🕒 {time_now}"
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
