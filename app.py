@@ -2,6 +2,8 @@ import streamlit as st
 import sqlite3
 from datetime import datetime
 import requests
+from init_db import *  # yoki faqat init_db() agar funksiyaga aylantirsangiz
+
 
 # ================= Telegram bot sozlamalari ==================
 BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"  # <-- o'zingizning bot tokeningiz
