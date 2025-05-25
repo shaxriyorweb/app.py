@@ -1,8 +1,6 @@
 import sqlite3
 import os
 
-DB_PATH = "users.db"
-
 def init_db():
     # Agar bazaviy fayl mavjud bo'lsa, o'chirib tashlaymiz (yangi bazani yaratish uchun)
     if os.path.exists(DB_PATH):
