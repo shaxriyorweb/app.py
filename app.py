@@ -3,8 +3,8 @@ import requests
 from datetime import datetime
 
 # ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"   # <-- bu yerga o'zingizning bot tokeningizni yozing
-CHAT_ID = "YOUR_CHAT_ID_OR_GROUP_ID"    # <-- bu yerga chat yoki guruh ID ni yozing
+BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"   # <-- bu yerga o'zingizning bot tokeningizni yozing
+CHAT_ID = "-1002671611327"    # <-- bu yerga chat yoki guruh ID ni yozing
 
 def send_telegram_message(firstname: str, lastname: str, category: str) -> bool:
     """Telegramga xodim kirishi haqida matnli xabar yuboradi"""
