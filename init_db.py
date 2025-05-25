@@ -1,54 +1,35 @@
-import sqlite3
-import os
+import streamlit as st
 
-# Fayl nomini aniqlaymiz
-DB_PATH = "users.db"
+# Foydalanuvchilar ma'lumotlari dict ko'rinishida
+users = {
+    "testuser": {"password": "1234", "firstname": "Ali", "lastname": "Valiyev", "category": "Admin"},
+    "johndoe": {"password": "abcd", "firstname": "John", "lastname": "Doe", "category": "Staff"},
+    "janedoe": {"password": "pass", "firstname": "Jane", "lastname": "Doe", "category": "HR"},
+    "anvarbek": {"password": "qwerty", "firstname": "Anvar", "lastname": "Beknazarov", "category": "IT"},
+    "nilufar": {"password": "12345", "firstname": "Nilufar", "lastname": "Karimova", "category": "Finance"},
+    "asadbek": {"password": "asdf", "firstname": "Asadbek", "lastname": "Rasulov", "category": "Manager"},
+    "dilnoza": {"password": "xyz", "firstname": "Dilnoza", "lastname": "Islomova", "category": "HR"},
+    "temurbek": {"password": "temur123", "firstname": "Temurbek", "lastname": "Xolmatov", "category": "Support"},
+    "aziza": {"password": "aziza12", "firstname": "Aziza", "lastname": "G‘aniyeva", "category": "Developer"},
+    "olim": {"password": "olim999", "firstname": "Olim", "lastname": "Murodov", "category": "Logistics"}
+}
 
-def init_db():
-    # Agar bazaviy fayl mavjud bo‘lsa, o‘chiramiz (yangi baza yaratish uchun)
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
+def check_user(username, password):
+    user = users.get(username)
+    if user and user["password"] == password:
+        return user["firstname"], user["lastname"], user["category"]
+    return None
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
+# Streamlit login panel
+st.title("Login")
 
-    # Jadval yaratish
-    c.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT,
-        firstname TEXT,
-        lastname TEXT,
-        category TEXT
-    )
-    ''')
+login = st.text_input("Login")
+password = st.text_input("Parol", type="password")
 
-    # Foydalanuvchilar ro'yxati
-    users = [
-        ("testuser", "1234", "Ali", "Valiyev", "Admin"),
-        ("johndoe", "abcd", "John", "Doe", "Staff"),
-        ("janedoe", "pass", "Jane", "Doe", "HR"),
-        ("anvarbek", "qwerty", "Anvar", "Beknazarov", "IT"),
-        ("nilufar", "12345", "Nilufar", "Karimova", "Finance"),
-        ("asadbek", "asdf", "Asadbek", "Rasulov", "Manager"),
-        ("dilnoza", "xyz", "Dilnoza", "Islomova", "HR"),
-        ("temurbek", "temur123", "Temurbek", "Xolmatov", "Support"),
-        ("aziza", "aziza12", "Aziza", "G‘aniyeva", "Developer"),
-        ("olim", "olim999", "Olim", "Murodov", "Logistics")
-    ]
-
-    # Ma'lumotlarni qo'shamiz
-    for user in users:
-        c.execute(
-            "INSERT INTO users (username, password, firstname, lastname, category) VALUES (?, ?, ?, ?, ?)",
-            user
-        )
-
-    conn.commit()
-    conn.close()
-    print("✅ Foydalanuvchilar bazasi muvaffaqiyatli yaratildi!")
-
-# Fayl bevosita ishga tushirilsa
-if __name__ == "__main__":
-    init_db()
+if st.button("Kirish"):
+    result = check_user(login, password)
+    if result:
+        firstname, lastname, category = result
+        st.success(f"Xush kelibsiz, {firstname} {lastname}!\nKategoriya: {category}")
+    else:
+        st.error("Login yoki parol noto‘g‘ri.")
