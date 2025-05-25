@@ -1,36 +1,36 @@
 import streamlit as st
-import requests
+import sqlite3
 from datetime import datetime
+import requests
 
-# ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "YOUR_BOT_TOKEN"   # Telegram bot tokeningizni shu yerga yozing
-CHAT_ID = "YOUR_CHAT_ID"       # Chat yoki guruh ID sini shu yerga yozing
+# Telegram sozlamalari
+BOT_TOKEN = "BOT_TOKENINGIZNI_KIRITING"
+CHAT_ID = "CHAT_ID_YOKI_GROUP_ID"
 
-def send_telegram_message(text: str) -> bool:
-    """Telegramga matnli xabar yuboradi"""
+def send_telegram_message(text: str):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
-        "parse_mode": "HTML"  # HTML formatida yuborish uchun
+        "parse_mode": "HTML"
     }
     try:
         response = requests.post(url, data=payload)
         return response.ok
     except Exception as e:
-        st.error(f"Telegram xabar yuborishda xatolik: {e}")
+        st.error(f"Telegramga yuborishda xatolik: {e}")
         return False
 
-# ================= Xodimlar ma'lumotlari ===================
-# login : (parol, ism, familiya)
-users = {
-    "user1": ("1234", "Ali", "Valiyev"),
-    "user2": ("abcd", "Gulnoza", "Sultonova"),
-    "user3": ("pass123", "Jasur", "Karimov"),
-    # Istalgancha qo‘shishingiz mumkin
-}
+# Foydalanuvchini tekshirish
+def check_user(username, password):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute("SELECT firstname, lastname, category FROM users WHERE username=? AND password=?", (username, password))
+    result = c.fetchone()
+    conn.close()
+    return result
 
-# ================= Streamlit UI ===========================
+# Streamlit UI
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
 st.title("🔐 Xodim Kirish Tizimi")
 
@@ -38,27 +38,25 @@ login = st.text_input("Login")
 password = st.text_input("Parol", type="password")
 
 if st.button("Kirish"):
-    if login in users and users[login][0] == password:
-        ism = users[login][1]
-        familiya = users[login][2]
+    user = check_user(login, password)
+    if user:
+        firstname, lastname, category = user
         vaqt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Foydalanuvchiga xush kelibsiz xabari
-        st.success(f"Xush kelibsiz, {ism} {familiya}!")
+        st.success(f"Xush kelibsiz, {firstname} {lastname}! ({category})")
 
-        # Telegram uchun xabar tayyorlash
-        message = (
-            f"🟢 <b>Xodim kirishi</b>:\n"
-            f"Login: <b>{login}</b>\n"
-            f"Ism: <b>{ism}</b>\n"
-            f"Familiya: <b>{familiya}</b>\n"
-            f"Kirish vaqti: <b>{vaqt}</b>"
+        msg = (
+            f"🟢 <b>Xodim kirishi</b>\n"
+            f"👤 Ism: <b>{firstname}</b>\n"
+            f"👥 Familiya: <b>{lastname}</b>\n"
+            f"🏷 Kategoriya: <b>{category}</b>\n"
+            f"🕒 Vaqt: <b>{vaqt}</b>\n"
+            f"🔑 Login: <code>{login}</code>"
         )
 
-        # Telegramga yuborish
-        if send_telegram_message(message):
-            st.info("Telegramga muvaffaqiyatli yuborildi!")
+        if send_telegram_message(msg):
+            st.info("✅ Telegramga yuborildi.")
         else:
-            st.error("Telegramga yuborishda xatolik yuz berdi.")
+            st.error("❌ Telegramga yuborilmadi.")
     else:
         st.error("❌ Login yoki parol noto‘g‘ri.")
