@@ -4,7 +4,7 @@ import os
 DB_PATH = "users.db"
 
 def init_db():
-    # Fayl mavjud bo‘lsa, o‘chirib yangi baza yaratamiz
+    # Agar bazaviy fayl mavjud bo'lsa, o'chirib tashlaymiz (yangi bazani yaratish uchun)
     if os.path.exists(DB_PATH):
         os.remove(DB_PATH)
 
