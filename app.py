@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 
 # Telegram bot sozlamalari
-BOT_TOKEN = "YOUR_BOT_TOKEN"  # O'zingizning bot tokeningizni yozing
+BOT_TOKEN = "YOUR_BOT_TOKE"  # O'zingizning bot tokeningizni yozing
 CHAT_ID = "YOUR_CHAT_ID"      # Guruh yoki foydalanuvchi chat ID
 
 # Telegramga matnli xabar yuborish
