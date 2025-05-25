@@ -47,6 +47,5 @@ def init_db():
     conn.close()
     print("✅ Foydalanuvchilar bazasi muvaffaqiyatli yaratildi!")
 
-# To‘g‘ridan-to‘g‘ri ishga tushganda bajariladi
 if __name__ == "__main__":
     init_db()
