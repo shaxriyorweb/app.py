@@ -4,8 +4,8 @@ import datetime
 import requests
 
 # Telegram bot sozlamalari
-BOT_TOKEN = "YOUR_BOT_TOKEN"
-CHAT_ID = "YOUR_CHAT_ID"
+BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"
+CHAT_ID = "-1002671611327"
 
 def send_to_telegram(firstname, lastname):
     time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
