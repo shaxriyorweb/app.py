@@ -2,7 +2,6 @@ import streamlit as st
 import sqlite3
 from datetime import datetime
 import requests
-from init_db import *  # yoki faqat init_db() agar funksiyaga aylantirsangiz
 
 
 # ================= Telegram bot sozlamalari ==================
