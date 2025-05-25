@@ -1,62 +1,60 @@
 import streamlit as st
-import sqlite3
+import telegram
 from datetime import datetime
-import requests
 
-# Telegram sozlamalari
-BOT_TOKEN = "BOT_TOKENINGIZNI_KIRITING"
-CHAT_ID = "CHAT_ID_YOKI_GROUP_ID"
+# Telegram bot token va chat id
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+CHAT_ID = "YOUR_CHAT_ID_HERE"
 
-def send_telegram_message(text: str):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "HTML"
-    }
-    try:
-        response = requests.post(url, data=payload)
-        return response.ok
-    except Exception as e:
-        st.error(f"Telegramga yuborishda xatolik: {e}")
-        return False
+bot = telegram.Bot(token=BOT_TOKEN)
 
-# Foydalanuvchini tekshirish
+# Foydalanuvchilar ma'lumotlari
+users = {
+    "testuser": {"password": "1234", "firstname": "Ali", "lastname": "Valiyev", "category": "Admin"},
+    "johndoe": {"password": "abcd", "firstname": "John", "lastname": "Doe", "category": "Staff"},
+    "janedoe": {"password": "pass", "firstname": "Jane", "lastname": "Doe", "category": "HR"},
+    "anvarbek": {"password": "qwerty", "firstname": "Anvar", "lastname": "Beknazarov", "category": "IT"},
+    "nilufar": {"password": "12345", "firstname": "Nilufar", "lastname": "Karimova", "category": "Finance"},
+    "asadbek": {"password": "asdf", "firstname": "Asadbek", "lastname": "Rasulov", "category": "Manager"},
+    "dilnoza": {"password": "xyz", "firstname": "Dilnoza", "lastname": "Islomova", "category": "HR"},
+    "temurbek": {"password": "temur123", "firstname": "Temurbek", "lastname": "Xolmatov", "category": "Support"},
+    "aziza": {"password": "aziza12", "firstname": "Aziza", "lastname": "G‘aniyeva", "category": "Developer"},
+    "olim": {"password": "olim999", "firstname": "Olim", "lastname": "Murodov", "category": "Logistics"}
+}
+
 def check_user(username, password):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("SELECT firstname, lastname, category FROM users WHERE username=? AND password=?", (username, password))
-    result = c.fetchone()
-    conn.close()
-    return result
+    user = users.get(username)
+    if user and user["password"] == password:
+        return user["firstname"], user["lastname"], user["category"]
+    return None
 
-# Streamlit UI
-st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
-st.title("🔐 Xodim Kirish Tizimi")
+def send_telegram_message(firstname, lastname, category):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = (
+        f"📥 *Xodim tizimga kirdi!*\n\n"
+        f"👤 Ism: {firstname} {lastname}\n"
+        f"🏷 Kategoriya: {category}\n"
+        f"⏰ Vaqti: {now}"
+    )
+    try:
+        bot.send_message(chat_id=CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+    except Exception as e:
+        print(f"Telegramga xabar yuborishda xatolik: {e}")
 
-login = st.text_input("Login")
-password = st.text_input("Parol", type="password")
+def main():
+    st.title("Xodimlar tizimiga kirish")
 
-if st.button("Kirish"):
-    user = check_user(login, password)
-    if user:
-        firstname, lastname, category = user
-        vaqt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    login = st.text_input("Login")
+    password = st.text_input("Parol", type="password")
 
-        st.success(f"Xush kelibsiz, {firstname} {lastname}! ({category})")
-
-        msg = (
-            f"🟢 <b>Xodim kirishi</b>\n"
-            f"👤 Ism: <b>{firstname}</b>\n"
-            f"👥 Familiya: <b>{lastname}</b>\n"
-            f"🏷 Kategoriya: <b>{category}</b>\n"
-            f"🕒 Vaqt: <b>{vaqt}</b>\n"
-            f"🔑 Login: <code>{login}</code>"
-        )
-
-        if send_telegram_message(msg):
-            st.info("✅ Telegramga yuborildi.")
+    if st.button("Kirish"):
+        result = check_user(login, password)
+        if result:
+            firstname, lastname, category = result
+            st.success(f"Xush kelibsiz, {firstname} {lastname}!\nKategoriya: {category}")
+            send_telegram_message(firstname, lastname, category)
         else:
-            st.error("❌ Telegramga yuborilmadi.")
-    else:
-        st.error("❌ Login yoki parol noto‘g‘ri.")
+            st.error("Login yoki parol noto‘g‘ri.")
+
+if __name__ == "__main__":
+    main()
