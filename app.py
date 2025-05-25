@@ -3,8 +3,10 @@ import sqlite3
 from datetime import datetime
 import requests
 
+# Telegram bot sozlamalari
 BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"
 CHAT_ID = "-1002671611327"
+
 DB_NAME = "users.db"
 
 def send_telegram_message(text: str):
@@ -30,17 +32,16 @@ def check_user(username, password):
     return result
 
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
-
 st.markdown("""
-    <style>
-        body {
-            background-color: #f6f6f6;
-        }
-        .stButton button {
-            background-color: #4CAF50;
-            color: white;
-        }
-    </style>
+<style>
+    body {
+        background-color: #f6f6f6;
+    }
+    .stButton button {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
 """, unsafe_allow_html=True)
 
 st.title("🔐 Xodim Kirish Tizimi")
@@ -70,8 +71,8 @@ if st.button("Kirish"):
         else:
             st.error("❌ Telegramga yuborilmadi.")
         
-        if login == "admin":
+        if category.lower() == "admin":
             st.subheader("🛠️ Admin Panel")
-            st.write("Hozircha: Foydalanuvchilarni ko‘rish yoki tahrirlash funksiyasi mavjud emas.")
+            st.write("Foydalanuvchilarni ko‘rish va tahrirlash imkoniyatlari keyingi versiyada qo‘shiladi.")
     else:
         st.error("❌ Login yoki parol noto‘g‘ri.")
