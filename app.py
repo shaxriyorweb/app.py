@@ -1,10 +1,12 @@
 import streamlit as st
 import requests
 from datetime import datetime
+import sqlite3
+import os
 
 # ================= Telegram bot sozlamalari ==================
-BOT_TOKEN = "7899690264:AAH14dhEGOlvRoc4CageMH6WYROMEE5NmkY"   # Telegram bot tokeningizni shu yerga yozing
-CHAT_ID = "-1002671611327"       # Chat yoki guruh ID sini shu yerga yozing
+BOT_TOKEN = "YOUR_BOT_TOKEN"   # Bu yerga Telegram bot tokeningizni yozing
+CHAT_ID = "YOUR_CHAT_ID"       # Bu yerga chat yoki guruh ID sini yozing
 
 def send_telegram_message(text: str) -> bool:
     """Telegramga matnli xabar yuboradi"""
@@ -12,56 +14,73 @@ def send_telegram_message(text: str) -> bool:
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
-        "parse_mode": "HTML"  # HTML formatida yuborish uchun
+        "parse_mode": "HTML"
     }
     try:
         response = requests.post(url, data=payload)
         return response.ok
     except Exception as e:
-        st.error(f"Telegram xabar yuborishda xatolik: {e}")
+        st.error(f"Telegramga xabar yuborishda xatolik: {e}")
         return False
 
-# ================= Xodimlar ma'lumotlari ===================
-# login : (parol, ism, familiya)
-users = {
-    "user1": ("1234", "Ali", "Valiyev"),
-    "user2": ("abcd", "Gulnoza", "Sultonova"),
-    "user3": ("pass123", "Jasur", "Karimov"),
-    "user4": ("qwerty", "Nodir", "Xolmirzayev"),
-    "user5": ("zxcvbn", "Malika", "Rahmonova"),
-    "user6": ("asdfgh", "Davron", "Islomov"),
-    "user7": ("yuiop", "Sevara", "Toshpulatova"),
-    "user8": ("lkjhg", "Sherzod", "Karimov"),
-    "user9": ("mnbvc", "Dildora", "Abdullayeva"),
-    "user10": ("poiuy", "Jasmina", "Salimova"),
-}
+# ================= SQLite bilan ishlash =======================
+DB_PATH = 'users.db'
 
-# ================= Streamlit UI ===========================
+def init_db():
+    """Bazani yaratadi va agar bo‘lmasa, boshlang‘ich foydalanuvchini qo‘shadi"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT,
+        firstname TEXT,
+        lastname TEXT
+    )''')
+    # Agar users bo‘sh bo‘lsa, birinchi foydalanuvchini qo‘shamiz
+    c.execute("SELECT COUNT(*) FROM users")
+    count = c.fetchone()[0]
+    if count == 0:
+        c.execute("INSERT INTO users (username, password, firstname, lastname) VALUES (?, ?, ?, ?)",
+                  ('testuser', '1234', 'Ali', 'Valiyev'))
+        conn.commit()
+    conn.close()
+
+def check_user(username, password):
+    """Foydalanuvchini bazadan tekshiradi"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT firstname, lastname FROM users WHERE username=? AND password=?", (username, password))
+    result = c.fetchone()
+    conn.close()
+    return result  # (firstname, lastname) yoki None
+
+# ================= Streamlit UI ==============================
 st.set_page_config(page_title="Xodim Kirish Tizimi", layout="centered")
 st.title("🔐 Xodim Kirish Tizimi")
+
+# Bazani ishga tushirish
+init_db()
 
 login = st.text_input("Login")
 password = st.text_input("Parol", type="password")
 
 if st.button("Kirish"):
-    if login in users and users[login][0] == password:
-        ism = users[login][1]
-        familiya = users[login][2]
+    user = check_user(login, password)
+    if user:
+        firstname, lastname = user
         vaqt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Foydalanuvchiga xush kelibsiz xabari
-        st.success(f"Xush kelibsiz, {ism} {familiya}!")
+        st.success(f"Xush kelibsiz, {firstname} {lastname}!")
 
-        # Telegram uchun xabar tayyorlash
         message = (
             f"🟢 <b>Xodim kirishi</b>:\n"
             f"Login: <b>{login}</b>\n"
-            f"Ism: <b>{ism}</b>\n"
-            f"Familiya: <b>{familiya}</b>\n"
+            f"Ism: <b>{firstname}</b>\n"
+            f"Familiya: <b>{lastname}</b>\n"
             f"Kirish vaqti: <b>{vaqt}</b>"
         )
 
-        # Telegramga yuborish
         if send_telegram_message(message):
             st.info("Telegramga muvaffaqiyatli yuborildi!")
         else:
